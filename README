@@ -1,0 +1,107 @@
+The goal of this programming assignment is to write a pair of R functions that can cache the inverse of a matrix. The first function, ‘makeCacheMatrix’, creates a special “matrix” object that can cache its inverse. The second function, ‘cacheSolve’, computes the inverse of the matrix returned by ‘makeCacheMatrix’. If the inverse has already been calculated and the matrix has not changed, then ‘cacheSolve’ retrieves the inverse from the cache.
+
+# Write a short comment describing this function
+
+‘makeCacheMatrix()’ is a function that creates a special “matrix” object that can cache its inverse.
+
+# Description
+
+The ‘makeCacheMatrix()’ function takes a matrix ‘x’ as its argument and returns a list containing four functions:
+
+1. ‘set’ - function to set the value of the matrix.
+2. ‘get’ - function to get the value of the matrix.
+3. ‘setinv’ - function to set the inverse of the matrix.
+4. ‘getinv’ - function to get the inverse of the matrix.
+
+If the inverse of the matrix has not yet been computed, then it is set to NULL.
+
+# Usage
+
+cacheMat <- makeCacheMatrix(matrix(1:4, nrow = 2, ncol = 2))
+
+# Arguments
+
+‘x’ - a matrix.
+
+First, let's implement the ‘makeCacheMatrix’ function. This function creates a special “matrix” object that can cache its inverse. Here is an implementation:
+
+makeCacheMatrix <- function(x = matrix()) {
+  # Initialize the cache
+  inv <- NULL
+  
+  # Define the set function to set the matrix and reset the cache
+  set <- function(matrix) {
+    x <<- matrix
+    inv <<- NULL
+  }
+  
+  # Define the get function to return the matrix
+  get <- function() x
+  
+  # Define the setinv function to set the cached inverse
+  setinv <- function(inverse) inv <<- inverse
+  
+  # Define the getinv function to return the cached inverse
+  getinv <- function() inv
+  
+  # Return a list with the above functions as its elements
+  list(set = set, get = get,
+       setinv = setinv,
+       getinv = getinv)
+}
+
+This function creates a list object with four functions:
+
+- ‘set’: sets the value of the matrix
+- ‘get’: gets the value of the matrix
+- ‘setinv’: sets the value of the cached inverse
+- ‘getinv’: gets the value of the cached inverse
+
+If the inverse has not yet been computed, the value of the cached inverse is set to ‘NULL’.
+
+Next, let's implement the ‘cacheSolve’ function. This function computes the inverse of the special “matrix” returned by ‘makeCacheMatrix’ above. If the inverse has already been calculated (and the matrix has not changed), then ‘cacheSolve’ should retrieve the inverse from the cache. Here is an implementation:
+
+cacheSolve <- function(x, ...) {
+  # Get the cached inverse if available
+  inv <- x$getinv()
+  if (!is.null(inv)) {
+    message("getting cached data")
+    return(inv)
+  }
+  
+  # If the inverse is not cached, compute it
+  data <- x$get()
+  inv <- solve(data, ...)
+  
+  # Cache the inverse
+  x$setinv(inv)
+  
+  # Return the inverse
+  inv
+}
+
+This function first checks if the inverse has already been computed and stored in the cache. If so, it retrieves the cached inverse and returns it, skipping the computation. Otherwise, it computes the inverse using the `solve` function and stores it in the cache using the `setinv` method. Finally, it returns the inverse.
+
+You can use the ‘makeCacheMatrix()’ function to create a matrix object that can cache its inverse, and then use the ‘cacheSolve()’ function to compute the inverse of the matrix. Here's an example:
+
+# create matrix
+m <- matrix(c(1, 2, 3, 4), nrow = 2, ncol = 2)
+
+# create cache matrix object
+cm <- makeCacheMatrix(m)
+
+# compute inverse and cache it
+cacheSolve(cm)
+
+# retrieve cached inverse
+cacheSolve(cm)
+
+# modify matrix
+m[1, 1] <- 5
+
+# try to retrieve cached inverse (should recalculate)
+cacheSolve(cm)
+
+In this example, we first create a matrix ‘m’ and then create a cache matrix object ‘cm’ using ‘makeCacheMatrix()’. We then compute the inverse of the matrix using ‘cacheSolve()’ and cache it in the cache matrix object. We retrieve the cached inverse using ‘cacheSolve()’ again, and verify that it is retrieved from the cache rather than being recalculated.
+
+We then modify the original matrix ‘m’, and try to retrieve the cached inverse again using ‘cacheSolve()’. This time, since the matrix has been modified, the cached inverse is no longer valid and must be recalculated.
